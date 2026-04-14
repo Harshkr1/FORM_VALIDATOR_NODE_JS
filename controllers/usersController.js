@@ -20,6 +20,17 @@ const validateUser = [
     .withMessage(`Last name ${alphaErr}`)
     .isLength({ min: 1, max: 10 })
     .withMessage(`Last name ${lengthErr}`),
+  body("email")
+    .trim()
+    .notEmpty()
+    .withMessage("Enter Email")
+    .isEmail()
+    .withMessage("Enter proper Email"),
+  body("age")
+    .optional()
+    .isInt({ min: 18, max: 120 })
+    .withMessage("enter valid range of age"),
+  body("bio").optional().isLength({ max: 200 }),
 ];
 
 exports.usersListGet = (req, res) => {
@@ -53,8 +64,8 @@ exports.usersCreatePost = [
 
     // MatchedData returns us an object of the data which has been validated
     // sucessfully.
-    const { firstName, lastName } = matchedData(req);
-    usersStorage.addUser({ firstName, lastName });
+    const { firstName, lastName, email, age, bio } = matchedData(req);
+    usersStorage.addUser({ firstName, lastName, email, age, bio });
     res.redirect("/");
   },
 ];
@@ -79,8 +90,14 @@ exports.usersUpdatePost = [
         errors: errors.array(),
       });
     }
-    const { firstName, lastName } = matchedData(req);
-    usersStorage.updateUser(req.params.id, { firstName, lastName });
+    const { firstName, lastName, email, age, bio } = matchedData(req);
+    usersStorage.updateUser(req.params.id, {
+      firstName,
+      lastName,
+      email,
+      age,
+      bio,
+    });
     res.redirect("/");
   },
 ];
@@ -88,4 +105,33 @@ exports.usersUpdatePost = [
 exports.usersDeletePost = (req, res) => {
   usersStorage.deleteUser(req.params.id);
   res.redirect("/");
+};
+
+exports.usersSearchGet = (req, res) => {
+  const { fullName, email } = req.query;
+
+  if (!fullName && !email) {
+    throw new Error("Enter at least one detail");
+  }
+
+  let users = usersStorage.getUsers(); 
+
+  if (fullName) {
+    const parts = fullName.trim().split(/\s+/);
+    const firstName = parts[0];
+    const lastName = parts.slice(1).join(" ");
+
+    users = users.filter((user) => {
+      return user.firstName === firstName && user.lastName === lastName;
+    });
+  }
+
+  if (email) {
+    users = users.filter((user) => user.email === email);
+  }
+
+  res.render("search", {
+    title: "Search User Page",
+    users: users,
+  });
 };

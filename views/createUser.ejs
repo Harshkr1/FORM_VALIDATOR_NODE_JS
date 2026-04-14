@@ -13,7 +13,22 @@
       <input type="text" name="firstName" id="firstName" required />
       <label for="lastName">Last Name: </label>
       <input type="text" name="lastName" id="lastName" required />
+      <label for="email">Email: </label>
+      <input type="email" name="email" id="email" required />
+      <label for="age"> Age: </label>
+      <input type="number" name="age" id="age" />
+      <label for="bio"> Bio: </label>
+      <input type="text" name="bio" id="bio" />
       <button type="submit">Submit</button>
+    </form>
+    <h1>Search for a User</h1>
+    <span>Enter the detail:</span>
+    <form action="/search/" method="GET">
+      <label for="name">Name: </label>
+      <input type="text" name="name" id="name" />
+      <label for="email">Email: </label>
+      <input type="text" name="email" id="email"  />
+      <button type="submit">Search</button>
     </form>
     <a href="/">Back to home</a>
   </body>
